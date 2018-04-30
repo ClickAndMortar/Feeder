@@ -1,0 +1,24 @@
+{
+    "name": "clickandmortar/feeder",
+    "description": "PHP data feeder for Elasticsearch",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michael BOUVY",
+            "email": "michael.bouvy@clickandmortar.fr"
+        }
+    ],
+    "require": {
+        "elasticsearch/elasticsearch": "6.*",
+        "willdurand/geocoder": "^3.2",
+        "symfony/console": "~2.6",
+        "symfony/config": "~2.7",
+        "symfony/yaml": "~2.7",
+        "symfony/dependency-injection": "~2.8"
+    },
+    "autoload": {
+        "psr-4": { "Feeder\\": "src/" }
+    }
+}
+
