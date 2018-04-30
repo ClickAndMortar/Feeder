@@ -94,15 +94,15 @@ class ElasticsearchCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->validateArguments($input);
-
         $debug = $input->getOption('debug');
         if ($debug) {
             $this->setDebug(true);
         }
 
+        $scriptDir = realpath(dirname($_SERVER['SCRIPT_FILENAME']));
+
         $dotenv = new Dotenv();
-        $dotenv->load(__DIR__ . '/../../../../.env', __DIR__ . '/../../../.env.dev');
+        $dotenv->load($scriptDir . '/../.env');
 
         $dsn = sprintf(
             'mysql:host=%s;port=%d;dbname=%s;charset=utf8',
@@ -118,25 +118,6 @@ class ElasticsearchCommand extends Command
         $esHost = getenv('ES_HOST');
         if (!empty($esHost)) {
             $this->setEsHosts($esHost);
-        }
-    }
-
-    /**
-     * Validate arguments
-     *
-     * @param InputInterface $input Input
-     *
-     * @throws \RuntimeException
-     *
-     * @return void
-     */
-    protected function validateArguments(InputInterface $input)
-    {
-        // ES host
-        $esHost = $input->getOption('es-host');
-        $parsedHost = parse_url($esHost);
-        if (empty($esHost) || !isset($parsedHost['port'])) {
-            throw new \RuntimeException("Missing Elasticsearch host parameter or invalid host");
         }
     }
 
@@ -316,7 +297,7 @@ class ElasticsearchCommand extends Command
                     'index' => [
                         '_index' => $indexName,
                         '_type'  => $typeName,
-                        '_id'    => $rowData['id'] . '-' . $this->getEnvironment()
+                        '_id'    => $rowData['id']
                     ]
                 ];
 
