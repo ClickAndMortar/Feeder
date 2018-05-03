@@ -2,7 +2,7 @@
 
 PHP data feeder for MySQL & Elasticsearch made with 💙 by Click & Mortar.
 
-## Usage
+## Install
 
 ```
 composer require clickandmortar/feeder
@@ -10,10 +10,14 @@ composer require clickandmortar/feeder
 
 Then:
 
-* Create a `.env` file at project's root based on `vendor/clickandmortar/feeder/.env.dist` template. 
-* Create a CLI app `bin/console` based on `examples/console` script
+Create a `.env` file at project's root based on `vendor/clickandmortar/feeder/.env.dist` template. 
 
-
-Create custom command(s) which extend `Feeder\Command\ElasticsearchCommand` in `src/Command`.
+Then create custom command(s) which extend `Feeder\Command\ElasticsearchCommand` in `src/Command`.
 
 See `examples/ExampleCommand.php` for example usage.
+
+## Usage
+
+```
+bin/feeder your:command
+```

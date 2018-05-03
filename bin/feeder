@@ -9,5 +9,4 @@ ini_set('memory_limit', '1024M');
 include(__DIR__ . '/../vendor/autoload.php');
 
 $application = new Application();
-$application->add(new MyCustomCommand());
 $application->run();

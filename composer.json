@@ -11,15 +11,17 @@
     ],
     "require": {
         "elasticsearch/elasticsearch": "6.*",
-        "willdurand/geocoder": "^3.2",
         "symfony/console": "~2.6",
         "symfony/config": "~2.7",
         "symfony/yaml": "~2.7",
         "symfony/dependency-injection": "~2.8",
-        "symfony/dotenv": "^4.0",
-        "geoip2/geoip2": "^2.4"
+        "symfony/dotenv": "^4.0"
     },
     "autoload": {
         "psr-4": { "Feeder\\": "src/" }
+    },
+    "bin": ["bin/feeder"],
+    "config": {
+        "bin-dir": "bin"
     }
 }
