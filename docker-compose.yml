@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  feeder:
+    image: php:7.1-cli
+    volumes:
+      - .:/app
+    working_dir: /app
