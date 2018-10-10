@@ -1,0 +1,19 @@
+parameters:
+  geo.class: "\\Feeder\\Service\\Geo"
+  geocoder_curl_adapter.class: "\\Ivory\\HttpAdapter\\CurlHttpAdapter"
+  geocoder.class: "\\Geocoder\\Provider\\GoogleMaps"
+  cache.class: "\\Feeder\\Cache\\File"
+
+services:
+  cache:
+    class: %cache.class%
+  geocoder_curl_adapter:
+    class: %geocoder_curl_adapter.class%
+  geocoder:
+    class: %geocoder.class%
+    arguments: ["@geocoder_curl_adapter"]
+  geo:
+    class: "%geo.class%"
+    arguments:
+    - "@geocoder"
+    - "@cache"

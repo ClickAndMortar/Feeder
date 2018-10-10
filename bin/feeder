@@ -2,11 +2,41 @@
 <?php
 // app/console
 
-use Symfony\Component\Console\Application;
+use Feeder\Console\Application;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 ini_set('memory_limit', '1024M');
 
-include(__DIR__ . '/../vendor/autoload.php');
+$rootDir = __DIR__ . '/../../../..';
+
+include($rootDir.'/vendor/autoload.php');
+
+$container = new ContainerBuilder();
+$loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../config'));
+$loader->load('services.yml');
+$container->compile();
 
 $application = new Application();
+$application->setContainer($container);
+
+$finder = new \Symfony\Component\Finder\Finder();
+$finder = $finder->files()->in($rootDir.'/src/Command/');
+
+foreach ($finder as $file) {
+    require_once $file;
+
+    $lastClass = array_pop(get_declared_classes());
+    if (!is_string($lastClass)) {
+        continue;
+    }
+
+    $reflection = new \ReflectionClass($lastClass);
+
+    if (!$reflection->isAbstract() && !$reflection->getConstructor()->getNumberOfRequiredParameters()) {
+        $application->add($reflection->newInstance());
+    }
+}
+
 $application->run();

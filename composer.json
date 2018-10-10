@@ -15,7 +15,8 @@
         "symfony/config": "~2.7",
         "symfony/yaml": "~2.7",
         "symfony/dependency-injection": "~2.8",
-        "symfony/dotenv": "^4.0"
+        "symfony/dotenv": "^4.0",
+        "symfony/finder": "^4.1"
     },
     "autoload": {
         "psr-4": { "Feeder\\": "src/" }
