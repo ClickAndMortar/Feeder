@@ -15,7 +15,9 @@ include($rootDir.'/vendor/autoload.php');
 
 $container = new ContainerBuilder();
 $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../config'));
-$loader->load('services.yml');
+if (class_exists('\Geocoder\Geocoder')) {
+    $loader->load('services/geo.yml');
+}
 $container->compile();
 
 $application = new Application();

@@ -1,0 +1,31 @@
+services:
+  cache:
+    class: "\\Feeder\\Cache\\File"
+  geocoder.curl.adapter:
+    class: '\\Ivory\\HttpAdapter\\CurlHttpAdapter'
+  geocoder.address:
+    class: '\\Geocoder\\Provider\\GoogleMaps'
+    arguments:
+    - "@geocoder.curl.adapter"
+    - 'nul'
+    - 'null'
+    - 'false'
+    - '%googlemaps.api.key%'
+  geocoder.geoip.reader:
+    class: \GeoIp2\Database\Reader
+    arguments:
+    - '%geoip.lite.db.path%'
+  geocoder.geoip.adapter:
+    class: \Geocoder\Adapter\GeoIP2Adapter
+    arguments:
+    - '@geocoder.geoip.reader'
+  geocoder.ip:
+    class: \Geocoder\Provider\GeoIP2
+    arguments:
+    - "@geocoder.geoip.adapter"
+  geo:
+    class: "\\Feeder\\Service\\Geo"
+    arguments:
+    - "@geocoder.address"
+    - "@geocoder.ip"
+    - "@cache"

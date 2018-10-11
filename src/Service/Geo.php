@@ -16,7 +16,12 @@ class Geo
     /**
      * @var Geocoder
      */
-    protected $geocoder;
+    protected $addressGeocoder;
+
+    /**
+     * @var Geocoder
+     */
+    protected $ipGeocoder;
 
     /**
      * @var Cache
@@ -26,12 +31,14 @@ class Geo
     /**
      * Geo constructor.
      *
-     * @param Geocoder $geocoder
+     * @param Geocoder $addressGeocoder
+     * @param Geocoder $ipGeocoder
      * @param Cache    $cache
      */
-    public function __construct(Geocoder $geocoder, Cache $cache)
+    public function __construct(Geocoder $addressGeocoder, Geocoder $ipGeocoder, Cache $cache)
     {
-        $this->geocoder = $geocoder;
+        $this->addressGeocoder = $addressGeocoder;
+        $this->ipGeocoder = $ipGeocoder;
         $this->cache = $cache;
     }
 
@@ -147,7 +154,7 @@ class Geo
     }
 
     /**
-     * Geo geopoints from an address
+     * Geo geopoints from a physical address
      *
      * @param string $rawAddress Address
      *
@@ -157,17 +164,45 @@ class Geo
      */
     public function getGeopointsFromAddress($rawAddress)
     {
-        $geocoder = $this->geocoder;
+        return $this->getGeopoints($rawAddress, $this->addressGeocoder);
+    }
+
+    /**
+     * Geo geopoints from an IP address
+     *
+     * @param string $ip IP
+     *
+     * @return string Geopoints lat,lng
+     *
+     * @throws \Exception
+     */
+    public function getGeopointsFromIpAddress($ip)
+    {
+        return $this->getGeopoints($ip, $this->ipGeocoder);
+    }
+
+    /**
+     * Geo geopoints
+     *
+     * @param string $value Physical address or IP address
+     * @param Geocoder $geocoder Geocoder instance
+     *
+     * @return string Geopoints lat,lng
+     *
+     * @throws \Exception
+     */
+    public function getGeopoints($value, Geocoder $geocoder)
+    {
         $cache = $this->cache;
-        $key = $rawAddress;
+        $key = $value;
         try {
             if (!$cache->exists($key)) {
-                $address = $geocoder->geocode($rawAddress)->first();
+                $address = $geocoder->geocode($value)->first();
                 $cache->save($key, $address);
             }
         } catch (\Exception $e) {
             $cache->save($key, 'error');
-            throw new \Exception('Address ' . $rawAddress . ' could not be geocoded:' . $e->getMessage());
+            throw new \Exception('Value ' . $value . ' could not be geocoded:' . $e->getMessage());
         }
 
         $address = $cache->get($key);

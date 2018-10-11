@@ -24,5 +24,9 @@
     "bin": ["bin/feeder"],
     "config": {
         "bin-dir": "bin"
+    },
+    "suggest": {
+        "willdurand/geocoder": "Allows usage of Geo service (^3.2)",
+        "geoip2/geoip2": "Allows using IP geocoding in Geo service (^2.4)"
     }
 }
