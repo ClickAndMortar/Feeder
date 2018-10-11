@@ -10,11 +10,11 @@ services:
     - 'nul'
     - 'null'
     - 'false'
-    - '%googlemaps.api.key%'
+    - '%env(GOOGLEMAPS_API_KEY)%'
   geocoder.geoip.reader:
     class: \GeoIp2\Database\Reader
     arguments:
-    - '%geoip.lite.db.path%'
+    - '%env(GEOIP_LITE_DB_PATH)%'
   geocoder.geoip.adapter:
     class: \Geocoder\Adapter\GeoIP2Adapter
     arguments:

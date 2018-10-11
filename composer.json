@@ -11,10 +11,10 @@
     ],
     "require": {
         "elasticsearch/elasticsearch": "6.*",
-        "symfony/console": "~2.6",
-        "symfony/config": "~2.7",
-        "symfony/yaml": "~2.7",
-        "symfony/dependency-injection": "~2.8",
+        "symfony/console": "~3.4",
+        "symfony/config": "~3.4",
+        "symfony/yaml": "~3.4",
+        "symfony/dependency-injection": "~3.4",
         "symfony/dotenv": "^4.0",
         "symfony/finder": "^4.1"
     },
