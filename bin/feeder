@@ -22,7 +22,7 @@ $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../config')
 if (interface_exists('\Geocoder\Geocoder')) {
     $loader->load('services/geo.yml');
 }
-$container->compile();
+$container->compile(true);
 
 $application = new Application();
 $application->setContainer($container);
