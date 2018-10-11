@@ -101,9 +101,6 @@ class ElasticsearchCommand extends Command
 
         $scriptDir = realpath(dirname($_SERVER['SCRIPT_FILENAME']));
 
-        $dotenv = new Dotenv();
-        $dotenv->load($scriptDir . '/../.env');
-
         $dsn = sprintf(
             'mysql:host=%s;port=%d;dbname=%s;charset=utf8',
             getenv('DB_HOST'),
