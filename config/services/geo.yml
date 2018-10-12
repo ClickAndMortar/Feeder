@@ -1,17 +1,18 @@
 services:
   cache:
-    class: "\\Feeder\\Cache\\File"
+    class: \Feeder\Cache\File
   geocoder.curl.adapter:
-    class: '\\Ivory\\HttpAdapter\\CurlHttpAdapter'
+    class: \Ivory\HttpAdapter\CurlHttpAdapter
   geocoder.address:
-    class: '\\Geocoder\\Provider\\GoogleMaps'
+    class: \Geocoder\Provider\GoogleMaps
     arguments:
-    - "@geocoder.curl.adapter"
-    - 'nul'
+    - '@geocoder.curl.adapter'
+    - 'null'
     - 'null'
     - 'false'
     - '%env(GOOGLEMAPS_API_KEY)%'
   geocoder.geoip.reader:
+    lazy: true
     class: \GeoIp2\Database\Reader
     arguments:
     - '%env(GEOIP_LITE_DB_PATH)%'
@@ -22,10 +23,10 @@ services:
   geocoder.ip:
     class: \Geocoder\Provider\GeoIP2
     arguments:
-    - "@geocoder.geoip.adapter"
+    - '@geocoder.geoip.adapter'
   geo:
-    class: "\\Feeder\\Service\\Geo"
+    class: \Feeder\Service\Geo
     arguments:
-    - "@geocoder.address"
-    - "@geocoder.ip"
-    - "@cache"
+    - '@geocoder.address'
+    - '@geocoder.ip'
+    - '@cache'
