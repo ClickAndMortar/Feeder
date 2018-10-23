@@ -6,6 +6,7 @@ use Feeder\Console\Application;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator as LazyProxyRuntimeInstantiator;
 use Symfony\Component\Dotenv\Dotenv;
 
 ini_set('memory_limit', '1024M');
@@ -18,6 +19,8 @@ $dotenv = new Dotenv();
 $dotenv->load($rootDir . '/.env');
 
 $container = new ContainerBuilder();
+$container->setProxyInstantiator(new LazyProxyRuntimeInstantiator());
+
 $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../config'));
 if (interface_exists('\Geocoder\Geocoder')) {
     $loader->load('services/geo.yml');
