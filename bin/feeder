@@ -36,7 +36,11 @@ $finder = $finder->files()->in($rootDir.'/src/Command/');
 foreach ($finder as $file) {
     require_once $file;
 
-    $lastClass = array_pop(get_declared_classes());
+    $declaredClasses = get_declared_classes();
+    if (!is_array($declaredClasses)) {
+        continue;
+    }
+    $lastClass = array_pop($declaredClasses);
     if (!is_string($lastClass)) {
         continue;
     }
