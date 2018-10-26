@@ -5,7 +5,7 @@ PHP data feeder for MySQL & Elasticsearch made with 💙 by Click & Mortar.
 ## Install
 
 ```
-composer require clickandmortar/feeder
+composer require clickandmortar/feeder ~0.1
 ```
 
 Then:
