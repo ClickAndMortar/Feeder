@@ -19,6 +19,13 @@ use Symfony\Component\Dotenv\Dotenv;
 class ElasticsearchCommand extends Command
 {
     /**
+     * Default since value
+     *
+     * @var string
+     */
+    const DEFAULT_SINCE = '24 hours ago';
+
+    /**
      * @var bool Debug mode
      */
     protected $debug = false;
@@ -79,7 +86,8 @@ class ElasticsearchCommand extends Command
     protected function configure()
     {
         $this
-            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Debug mode');
+            ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Debug mode')
+            ->addOption('since', 's', InputOption::VALUE_OPTIONAL, 'Import data since', self::DEFAULT_SINCE);
 
         date_default_timezone_set('UTC');
     }
@@ -359,5 +367,25 @@ class ElasticsearchCommand extends Command
         $duration = $end - $this->timers[$name];
 
         return round($duration * 1000);
+    }
+
+    /**
+     * Get since formatted date from $input
+     *
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return string
+     */
+    protected function getSince(InputInterface $input, OutputInterface $output)
+    {
+        $since = $input->getOption('since');
+        $since = strtotime($since);
+        if (!$since) {
+            $since = strtotime(self::DEFAULT_SINCE);
+            $output->write(sprintf('<info>Invalid since option supplied, using default (%s)</info>', self::DEFAULT_SINCE));
+        }
+
+        return gmdate('Y-m-d H:i:s', $since);
     }
 }
