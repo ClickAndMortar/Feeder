@@ -288,6 +288,12 @@ class ElasticsearchCommand extends Command
 
             /** @var \PDOStatement $statement */
             $statement = $db->prepare($query);
+
+            $output->writeln(
+                'Query: ' . $statement->queryString,
+                OutputInterface::VERBOSITY_DEBUG
+            );
+
             $statement->execute();
             $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
@@ -295,7 +301,11 @@ class ElasticsearchCommand extends Command
                 $continue = false;
             }
 
+            $previousRowId = '';
             foreach ($rows as $rowData) {
+                if ($rowData['id'] == $previousRowId) {
+                    throw new \Exception('Dupplicated row with id "' . $previousRowId . '"');
+                }
                 $i++;
 
                 $params['body'][] = [
@@ -324,10 +334,16 @@ class ElasticsearchCommand extends Command
                     $output->writeln("<info>Writing " . $batchSize . " documents to Elasticsearch ...");
                     $responses = $client->bulk($params);
 
+                    if (!empty($responses) && is_array($responses)) {
+                        $this->checkResponsesErrors($output, $responses);
+                    }
+
                     $params = ['body' => []];
 
                     unset($responses);
                 }
+
+                $previousRowId = $rowData['id'];
             }
         }
 
@@ -335,7 +351,9 @@ class ElasticsearchCommand extends Command
             $responses = $client->bulk($params);
         }
 
-        // TODO: parse responses for possible errors
+        if (!empty($responses) && is_array($responses)) {
+            $this->checkResponsesErrors($output, $responses);
+        }
 
         $output->writeln(
             sprintf('<info><options=bold>%d</options=bold> documents successfuly imported from database', $i)
@@ -370,6 +388,24 @@ class ElasticsearchCommand extends Command
     }
 
     /**
+     * @param OutputInterface $output
+     * @param array $responses
+     */
+    protected function checkResponsesErrors(OutputInterface $output, array $responses): void
+    {
+        foreach ($responses as $response) {
+            if (!empty($response['index']['error'])) {
+                $output->writeln(sprintf('[%s] %s: %s',
+                    $response['index']['_id'],
+                    $response['index']['error']['type'],
+                    $response['index']['error']['reason']
+                ));
+            }
+        }
+    }
+
+    /**
+     *
      * Get since formatted date from $input
      *
      * @param InputInterface  $input
