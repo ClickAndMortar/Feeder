@@ -3,7 +3,6 @@
 namespace Feeder\Service;
 
 use Feeder\Cache\Cache;
-use Geocoder\Geocoder;
 
 /**
  * Geo related operations service
@@ -14,14 +13,18 @@ use Geocoder\Geocoder;
 class Geo
 {
     /**
-     * @var Geocoder
+     * Version for AWS Location service
+     *
+     * @var string
      */
-    protected $addressGeocoder;
+    const AWS_LOCATION_SERVICE_VERSION = '2020-11-19';
 
     /**
-     * @var Geocoder
+     * Countries filter for geocoding
+     *
+     * @var array
      */
-    protected $ipGeocoder;
+    protected $countriesFilter = ['FRA'];
 
     /**
      * @var Cache
@@ -31,14 +34,10 @@ class Geo
     /**
      * Geo constructor.
      *
-     * @param Geocoder $addressGeocoder
-     * @param Geocoder $ipGeocoder
      * @param Cache    $cache
      */
-    public function __construct(Geocoder $addressGeocoder, Geocoder $ipGeocoder, Cache $cache)
+    public function __construct(Cache $cache)
     {
-        $this->addressGeocoder = $addressGeocoder;
-        $this->ipGeocoder = $ipGeocoder;
         $this->cache = $cache;
     }
 
@@ -164,53 +163,59 @@ class Geo
      */
     public function getGeopointsFromAddress($rawAddress)
     {
-        return $this->getGeopoints($rawAddress, $this->addressGeocoder);
-    }
-
-    /**
-     * Geo geopoints from an IP address
-     *
-     * @param string $ip IP
-     *
-     * @return string Geopoints lat,lng
-     *
-     * @throws \Exception
-     */
-    public function getGeopointsFromIpAddress($ip)
-    {
-        return $this->getGeopoints($ip, $this->ipGeocoder);
-    }
-
-    /**
-     * Geo geopoints
-     *
-     * @param string $value Physical address or IP address
-     * @param Geocoder $geocoder Geocoder instance
-     *
-     * @return string Geopoints lat,lng
-     *
-     * @throws \Exception
-     */
-    public function getGeopoints($value, Geocoder $geocoder)
-    {
         $cache = $this->cache;
-        $key = $value;
+        $key = $rawAddress;
         try {
             if (!$cache->exists($key)) {
-                $address = $geocoder->geocode($value)->first();
-                $cache->save($key, $address);
+                $geopoints = $this->getGeopoints($rawAddress);
+                $cache->save($key, $geopoints);
             }
         } catch (\Exception $e) {
             $cache->save($key, 'error');
-            throw new \Exception('Value ' . $value . ' could not be geocoded:' . $e->getMessage());
+            throw new \Exception('Value ' . $rawAddress . ' could not be geocoded:' . $e->getMessage());
         }
 
-        $address = $cache->get($key);
-
-        if (!is_object($address)) {
-            return '';
+        $geopoints = $cache->get($key);
+        if ($geopoints === 'error') {
+            return null;
         }
 
-        return $address->getLatitude() . ',' . $address->getLongitude();
+        return $geopoints;
+    }
+
+    /**
+     * Geo geopoints from $value
+     *
+     * @param string $value Raw address
+     *
+     * @return string Geopoints lat,lng
+     *
+     * @throws \Exception
+     */
+    public function getGeopoints($value)
+    {
+        $locationServiceClient = new \Aws\LocationService\LocationServiceClient([
+            'region' => getenv('AWS_REGION'),
+            'version' => self::AWS_LOCATION_SERVICE_VERSION,
+        ]);
+        $response = $locationServiceClient->searchPlaceIndexForText([
+            'IndexName' => getenv('AWS_LOCATION_INDEX_NAME'),
+            'FilterCountries' => $this->countriesFilter,
+            'Text' => $value,
+        ]);
+        $results = $response->get('Results');
+        if (
+            !empty($results)
+            && isset($results[0]['Place']['Geometry']['Point'][1])
+            && isset($results[0]['Place']['Geometry']['Point'][0])
+        ) {
+            return sprintf(
+                '%s,%s',
+                $results[0]['Place']['Geometry']['Point'][1],
+                $results[0]['Place']['Geometry']['Point'][0]
+            );
+        }
+
+        return 'error';
     }
 }

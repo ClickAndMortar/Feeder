@@ -18,7 +18,8 @@
         "symfony/dotenv": "^4.0",
         "symfony/finder": "^4.1",
         "ocramius/proxy-manager": "2.1.*",
-        "symfony/proxy-manager-bridge": "^4.1"
+        "symfony/proxy-manager-bridge": "^4.1",
+        "aws/aws-sdk-php": "3.277.*"
     },
     "autoload": {
         "psr-4": { "Feeder\\": "src/" }
@@ -26,9 +27,5 @@
     "bin": ["bin/feeder"],
     "config": {
         "bin-dir": "bin"
-    },
-    "suggest": {
-        "willdurand/geocoder": "Allows usage of Geo service (^3.2)",
-        "geoip2/geoip2": "Allows using IP geocoding in Geo service (^2.4)"
     }
 }
