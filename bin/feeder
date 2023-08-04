@@ -22,9 +22,7 @@ $container = new ContainerBuilder();
 $container->setProxyInstantiator(new LazyProxyRuntimeInstantiator());
 
 $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../config'));
-if (interface_exists('\Geocoder\Geocoder')) {
-    $loader->load('services/geo.yml');
-}
+$loader->load('services/geo.yml');
 $container->compile(true);
 
 $application = new Application();

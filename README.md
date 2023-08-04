@@ -21,8 +21,3 @@ See `examples/ExampleCommand.php` for example usage.
 ```
 bin/feeder your:command
 ```
-
-## Specific services
-
-### Geocoding
-
